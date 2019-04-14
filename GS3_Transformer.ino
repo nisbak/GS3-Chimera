@@ -49,7 +49,7 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 // Motor PWM controller is an automotive VNH5019 bridge. 20kHz PWM frequency is used as below. Please note the library was modified 
 // to support a single VNH5019 chip (instead of a dual chip carrier)
 // https://forum.pololu.com/t/modified-vnh5019-shield-library-for-20khz-pwm-with-mega/5178/2
-VNH5019MotorShieldMega md = VNH5019MotorShieldMega(INA1, INB1, EN1DIAG1, CS1);
+// VNH5019MotorShieldMega md = VNH5019MotorShieldMega(INA1, INB1, EN1DIAG1, CS1);
 
 // Define 2 PID loops - one for pressure and one for flow....
 double g_PIDSetpoint_F, g_PIDInput_F, g_PIDOutput_F, g_PIDInput_P, g_PIDOutput_P, g_PIDSetpoint_P;
@@ -162,19 +162,6 @@ unsigned char scaleBattery;
 uint32_t scaleReconnectionTimer; //scaleIdleTimer, startTime
 #endif
 
-//********************************************************************
-// Motor Error
-//********************************************************************
-
-void stopIfFault()
-{
-	if (md.getM1Fault())
-	{
-		Serial.println("M1 fault");
-		while (1);
-	}
-}
-
 //*************************************************************************
 // Interrupt handlers 
 // 1. When Solenoid is activated (ignore spurious triggers if pull is active)
@@ -200,7 +187,7 @@ void flowPulseReceived(bool preInfusion) // receives flow pulses from the Gicar 
 void setup() 
 {
 	// Initialize hardware
-	md.init(); // Initialize VNH5019 pump driver
+	// md.init(); // Initialize VNH5019 pump driver
 	tft.begin(); // Initialize displays
 #ifdef DISPLAY_ROTATION
 	tft.setRotation(2);
@@ -354,9 +341,10 @@ void loop(void)
     Serial.println("Fill tank");
 		 while (digitalRead(PUMP_RELAY) == LOW && !g_newPull)
 		 {
-			 md.setM1Speed(constrain(flushPWM, pumpMinPWM, pumpMaxPWM));
+			phasecontrol::set_level(constrain(flushPWM, pumpMinPWM, pumpMaxPWM));
+			phasecontrol::strat();
 		 }
-      md.setM1Speed(0); //Shut down pump motor
+      phasecontrol::stop(); //Shut down pump motor
       Serial.println("Fill tank stopped.");              
     }
 
