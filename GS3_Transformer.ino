@@ -1,6 +1,6 @@
 #define CURRENT_VERSION "V0.50"
 
-#include "VNH5019MotorShieldMega.h"
+//#include "VNH5019MotorShieldMega.h"
 #include "configuration.h"
 
 #include "SPI.h"
