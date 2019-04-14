@@ -72,7 +72,8 @@ uint16_t setPumpPWMbyMode(uint16_t profileIndex, uint32_t pullTimer, uint16_t pu
 			break;
 	}
 	// Action Time - operate pump & operate FLB solenoid
-	md.setM1Speed(constrain(pumpPWM, pumpMinPWM, pumpMaxPWM));
+	phasecontrol::set_level(constrain(flushPWM, pumpMinPWM, pumpMaxPWM));
+	phasecontrol::start();
 	return pumpPWM;
 }
 
@@ -158,14 +159,15 @@ void flushCycle()
 		while (digitalRead(GROUP_SOLENOID) == LOW && !Serial2.available())
 		{
 			setFLB(true); // turn on FLB
-			md.setM1Speed(constrain(flushPWM, pumpMinPWM, pumpMaxPWM));
+			phasecontrol::set_level(constrain(flushPWM, pumpMinPWM, pumpMaxPWM));
+			phasecontrol::start()
 			flushPauseTimer = millis();
 			if (((millis() - flushTimer))/250 % 2 == 0)
 				ledColor('g');
 			else
 				ledColor('y');
 		}
-		md.setM1Speed(0); //Shut down pump motor
+		phasecontrol::stop(); //Shut down pump motor
 		setFLB(false);
 		if (((millis() - flushTimer))/250 % 2 == 0)
 			ledColor('r');
