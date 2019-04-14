@@ -24,7 +24,7 @@ byte shutdownIfPullOver(byte countOffCycles, uint16_t lastProfileIndex)
 void resetSystem()
 {
 	Serial.println("Resetting hardware and interrupts");
-	md.setM1Speed(0); //Shut down pump motor 
+	phasecontrol::stop(); //Shut down pump motor 
 	stopPID(); //Shut down PID loops
 	setFLB(false);
 	ledColor('r');
